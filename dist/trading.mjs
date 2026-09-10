@@ -1,4 +1,4 @@
-import {SHOPS,holdings,emptyOffer,trade} from './engine.mjs';
+import {SHOPS,holdings,emptyOffer,trade} from './engine.mjs?v=4';
 
 export function makeDraft(state, partner, prefillLot=null, prefillShop=null) {
   if (![1,2,3].includes(partner)) throw Error('Choose a neighbor.');
@@ -18,7 +18,7 @@ export function adjustDraft(state,draft,side,kind,index,delta=1) {
   return draft;
 }
 
-export function createTrading({getState,tr,sprite,token,modal,closeModal,onChanged,playSound,onTrading}) {
+export function createTrading({getState,tr,sprite,token,modal,closeModal,onChanged,playSound,onTrading,speak=()=>{}}) {
   let draft=null,status='idle',message='',shortfall=0,timer=null;
   const names=['coffee','banhmi','pho','flowers','tailor','grocery'];
   const $=s=>document.querySelector(s);
@@ -48,19 +48,19 @@ export function createTrading({getState,tr,sprite,token,modal,closeModal,onChang
     if(action==='person'){draft=makeDraft(getState(),Number(el.dataset.player));status='idle';intro();}
     else if(action==='again'){draft=makeDraft(getState(),draft.partner);status='idle';intro();}
     else if(action==='propose'){
-      status='thinking';message=tr('Hmm… let me count that up.','Hừm… để tính chút coi nào.');playSound('deal-open');render();
-      timer=setTimeout(()=>{if(!draft||!$('#modal').open)return;try{const result=trade(getState(),draft);shortfall=result.shortfall||0;if(result.accepted){status='accepted';message=tr('You’ve got a deal! A coffee on me next time.','Rồi, chốt! Bữa sau ghé uống cà phê nha!');onChanged();playSound('deal');}else{status='rejected';message=tr(`Close! Add ${shortfall} đ, or show me a different package.`,`Suýt được rồi! Thêm ${shortfall} đ đi, hoặc đổi món khác thử nha.`);playSound('reject');}}catch(error){status='rejected';message=error.message;}render();},650);return;
+      status='thinking';message=tr('Hmm… let me count that up.','Hừm… để tính chút coi nào.');speak('thinking',draft.partner);render();
+      timer=setTimeout(()=>{if(!draft||!$('#modal').open)return;try{const result=trade(getState(),draft);shortfall=result.shortfall||0;if(result.accepted){status='accepted';message=tr('You’ve got a deal! A coffee on me next time.','Rồi, chốt! Bữa sau ghé uống cà phê nha!');onChanged();playSound('deal');speak('positive',draft.partner);}else{status='rejected';message=tr(`Close! Add ${shortfall} đ, or show me a different package.`,`Suýt được rồi! Thêm ${shortfall} đ đi, hoặc đổi món khác thử nha.`);playSound('reject');speak('negative',draft.partner);}}catch(error){status='rejected';message=error.message;speak('negative',draft.partner);}render();},650);return;
     }else if(action==='counter'){adjustDraft(getState(),draft,'give','cash',0,shortfall);status='idle';message=tr('That looks better. Ready to shake on it?','Nghe hợp lý hơn rồi đó. Chốt luôn không?');}
     else if(action==='cash')adjustDraft(getState(),draft,el.dataset.side,'cash',0,Number(el.dataset.delta));
     else if(action==='asset'||action==='remove')adjustDraft(getState(),draft,el.dataset.side,el.dataset.kind,Number(el.dataset.index),action==='remove'?-1:1);
     if(['cash','asset','remove'].includes(action)&&status==='rejected'){status='idle';shortfall=0;intro();}
     playSound('tap');const key=['bargain','side','kind','index','player','delta'].map(k=>el.dataset[k]!==undefined?`[data-${k}="${el.dataset[k]}"]`:'').join('');render();if(key)$('#modal')?.querySelector(key)?.focus({preventScroll:true});
   }
-  function cashChanged(el){
+  function cashChanged(el,normalize=true){
     if(!draft||status==='thinking')return;
     const side=el.dataset.bargainCash,p=getState().players[side==='give'?0:draft.partner];
     draft[side].cash=Math.max(0,Math.min(p.cash,Math.floor(Number(el.value)||0)));
-    el.value=draft[side].cash;
+    if(normalize)el.value=draft[side].cash;
     // Keep the input and pending click target mounted when a cash field loses focus.
     const tray=el.closest('.barter-side').querySelector('.offer-tray');
     tray.querySelector('.cash-chip')?.remove();
@@ -75,5 +75,6 @@ export function createTrading({getState,tr,sprite,token,modal,closeModal,onChang
     }
     $('.bargain-submit').disabled=!hasItems(draft.give)&&!hasItems(draft.take);
   }
-  return {open,cancel,handle,cashChanged,isOpen:()=>draft!==null};
+  function dismiss(){if(draft&&status!=='accepted'&&(status==='rejected'||hasItems(draft.give)||hasItems(draft.take)))speak('negative',draft.partner);cancel();}
+  return {open,cancel,dismiss,handle,cashChanged,isOpen:()=>draft!==null};
 }

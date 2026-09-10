@@ -1,4 +1,4 @@
-# Vietnamtown neighborhood landmarks
+# Saigon Town neighborhood landmarks
 
 Six original 96 × 96 pixel-art designs, created from explicit pixel coordinates using the installed Aseprite application's native Lua `Image:drawPixel`, `Sprite:newLayer`, and `Sprite:newCel` APIs. No image-generation model, downloaded artwork, tracing, or raster conversion was used. All sprites are fictional interpretations for a board game, not architectural records.
 

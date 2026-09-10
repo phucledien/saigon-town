@@ -1,4 +1,4 @@
-# Vietnam Town — original Aseprite shop sprites
+# Saigon Town — original Aseprite shop sprites
 
 Six original 96 × 96 transparent RGBA shop sprites. All drawing was authored as deliberate integer-coordinate pixel marks in `draw-shops.lua` and executed by the installed Aseprite binary. No source photograph was traced, imported into the artwork, or used as a texture; no image-generation tool was used.
 

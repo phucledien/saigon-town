@@ -43,7 +43,9 @@ export function createGameAudio({ onChange } = {}) {
   }
   function release(voice) {
     voices.delete(voice);
-    try { voice.source.disconnect(); voice.gain.disconnect(); voice.filter.disconnect(); } catch {}
+    for (const node of voice.nodes || [voice.source, voice.gain, voice.filter]) {
+      try { node.disconnect(); } catch {}
+    }
   }
   function fadeVoice(voice, time = .06) {
     if (!ctx) return;
@@ -143,6 +145,72 @@ export function createGameAudio({ onChange } = {}) {
     };
     (effects[kind] || effects.tap).forEach(([midi, offset, duration, volume]) => voice({ midi, at: now + offset, duration, volume, type: 'triangle', cutoff: 2700 }));
   }
+  // A tiny vowel synthesizer: a voiced carrier through three moving formants.
+  // These are expressive nonsense syllables, never recorded or spoken words.
+  const VOWELS = { uh:[520,1190,2500], ah:[740,1250,2650], eh:[550,1850,2650], ee:[330,2250,3000], oo:[370,850,2350] };
+  const SPEECH = {
+    positive: [
+      ['eh','ee',0,.11,0,4], ['ah','eh',.135,.12,2,6],
+      ['eh','ee',.285,.16,4,9], ['oo','ee',.48,.18,7,10]
+    ],
+    negative: [
+      ['uh','eh',0,.18,0,2], ['uh','oo',.255,.14,-1,-4],
+      ['ah','uh',.455,.12,-2,-5], ['uh','oo',.615,.19,-4,-8]
+    ],
+    thinking: [['oo','uh',0,.18,-3,-1], ['uh','oo',.23,.22,-1,-4]]
+  };
+  function stopSpeech() {
+    for (const item of voices) if (item.speech) fadeVoice(item, .025);
+  }
+  function duckMusic(until) {
+    if (!ctx || !musicBus) return;
+    const now = ctx.currentTime, gain = musicBus.gain;
+    gain.cancelScheduledValues(now);
+    gain.setTargetAtTime(.09, now, .025);
+    gain.setTargetAtTime(.28, until + .05, .12);
+  }
+  function syllable({ from, to, at, duration, base, pitchFrom, pitchTo, formantScale, emphasis }) {
+    const source = ctx.createOscillator(), gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter(); filter.type = 'lowpass';
+    filter.frequency.value = 3700 * formantScale; filter.Q.value = .45;
+    source.type = 'sawtooth';
+    source.frequency.setValueAtTime(HZ(base + pitchFrom), at);
+    source.frequency.exponentialRampToValueAtTime(HZ(base + pitchTo), at + duration * .72);
+    source.frequency.exponentialRampToValueAtTime(HZ(base + pitchTo - .7), at + duration);
+    source.connect(filter);
+    const nodes = [source, filter, gain];
+    VOWELS[from].forEach((frequency, index) => {
+      const formant = ctx.createBiquadFilter(), weight = ctx.createGain();
+      formant.type = 'bandpass'; formant.Q.value = [4.5,6,8][index];
+      formant.frequency.setValueAtTime(frequency * formantScale, at);
+      formant.frequency.exponentialRampToValueAtTime(VOWELS[to][index] * formantScale, at + duration * .85);
+      weight.gain.value = [1,.52,.23][index];
+      filter.connect(formant); formant.connect(weight); weight.connect(gain);
+      nodes.push(formant, weight);
+    });
+    gain.gain.setValueAtTime(.0001, at);
+    gain.gain.exponentialRampToValueAtTime(.64 * emphasis, at + .018);
+    gain.gain.setTargetAtTime(.48 * emphasis, at + duration * .40, .025);
+    gain.gain.exponentialRampToValueAtTime(.0001, at + duration);
+    gain.connect(effectsBus);
+    const item = { source, gain, filter, nodes, music:false, speech:true };
+    voices.add(item); source.onended = () => release(item);
+    source.start(at); source.stop(at + duration + .02);
+  }
+  function speak(mood = 'positive', person = 1) {
+    if (!sfx || !unlocked || !visible() || destroyed || !ctx || ctx.state !== 'running') return;
+    stopSpeech();
+    const phrase = SPEECH[mood] || SPEECH.thinking;
+    // Linh is brighter, Minh lower, An softer. Stable voices support recognition.
+    const persona = [ {base:56,scale:1.02}, {base:58,scale:1.12}, {base:51,scale:.90}, {base:55,scale:1.02} ];
+    const {base,scale} = persona[person] || persona[1];
+    const now = ctx.currentTime + .025;
+    duckMusic(now + phrase.at(-1)[2] + phrase.at(-1)[3]);
+    phrase.forEach(([from,to,offset,duration,pitchFrom,pitchTo],index) => {
+      syllable({ from, to, at:now+offset, duration, base, pitchFrom, pitchTo,
+        formantScale:scale, emphasis:index === 0 ? 1 : .85 });
+    });
+  }
   const visibilityChange = () => { void sync(); };
   doc?.addEventListener('visibilitychange', visibilityChange);
   return {
@@ -151,7 +219,7 @@ export function createGameAudio({ onChange } = {}) {
     setMusic(value) { music = Boolean(value); safeWrite('vietnamtown-music', music); notify(); void sync(); },
     setPhase(value) { if (PHASES[value] && value !== 'bargain' && phase !== value) { phase = value; if (!trading) restartScore(); } },
     setTrading(value) { value = Boolean(value); if (trading !== value) { trading = value; restartScore(); } },
-    play, getSettings: settings,
+    play, speak, getSettings: settings,
     destroy() {
       if (destroyed) return;
       destroyed = true; transportGeneration++; stopTransport();

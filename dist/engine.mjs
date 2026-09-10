@@ -1,3 +1,4 @@
+import {plotNeighbors,BOARD_REVISION} from './board-layout.mjs?v=4';
 export const SHOPS=[
 {id:'coffee',name:'Cà phê',english:'Coffee house',code:'CF',size:3,color:'#825d43'},
 {id:'banhmi',name:'Bánh mì',english:'Sandwich shop',code:'BM',size:3,color:'#b7782c'},
@@ -11,12 +12,18 @@ export const KEEP=[5,4,3,2,2,2];
 export const COMPLETE=[0,0,0,50,80,110,140];
 export const INCOMPLETE=[0,10,20,40,60,80];
 export function shuffle(a,rng=Math.random){return a.map(x=>[rng(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);}
-export function neighbors(id){const b=Math.floor(id/12),i=id%12,x=i%4,y=Math.floor(i/4);return [[x-1,y],[x+1,y],[x,y-1],[x,y+1]].filter(([x,y])=>x>=0&&x<4&&y>=0&&y<3).map(([x,y])=>b*12+y*4+x);}
+export const neighbors=plotNeighbors;
 export function groups(state,player){const seen=new Set(),out=[];for(const lot of state.lots){if(lot.owner!==player||lot.shop===null||seen.has(lot.id))continue;const stack=[lot.id],ids=[];seen.add(lot.id);while(stack.length){const id=stack.pop();ids.push(id);for(const n of neighbors(id)){const next=state.lots[n];if(next.owner===player&&next.shop===lot.shop&&!seen.has(n)){seen.add(n);stack.push(n);}}}out.push({shop:lot.shop,lots:ids,size:ids.length});}return out;}
 export function groupIncome(shop,count){const target=SHOPS[shop].size;return Math.floor(count/target)*COMPLETE[target]+INCOMPLETE[count%target];}
 export function income(state,player){return groups(state,player).reduce((n,g)=>n+groupIncome(g.shop,g.size),0);}
 export function holdings(state,player){return state.lots.filter(x=>x.owner===player);}
-export function newGame(rng=Math.random){const state={version:1,year:1,phase:'receive',players:['You','Linh','Minh','An'].map((name,id)=>({id,name,cash:50,tiles:[0,0,0,0,0,0]})),lots:Array.from({length:72},(_,id)=>({id,owner:null,shop:null})),bag:shuffle(Array.from({length:120},(_,i)=>i%6),rng),pending:[],draftCount:0,logs:[],lastIncome:[],trades:0};startYear(state,rng);return state;}
+export function newGame(rng=Math.random){const state={version:1,boardRevision:BOARD_REVISION,year:1,phase:'receive',players:['You','Linh','Minh','An'].map((name,id)=>({id,name,cash:50,tiles:[0,0,0,0,0,0]})),lots:Array.from({length:72},(_,id)=>({id,owner:null,shop:null})),bag:shuffle(Array.from({length:120},(_,i)=>i%6),rng),pending:[],draftCount:0,logs:[],lastIncome:[],trades:0};startYear(state,rng);return state;}
+export function updateBoardLayout(state){
+  if(state.boardRevision===BOARD_REVISION)return false;
+  state.boardRevision=BOARD_REVISION;
+  if(state.lots.some(l=>l.owner!==null))log(state,'The city map now has irregular blocks. Plot numbers, owners, shops and cash are unchanged; future business income follows the new shared edges.');
+  return true;
+}
 function drawTiles(state,player,count){for(let i=0;i<count&&state.bag.length;i++)state.players[player].tiles[state.bag.pop()]++;}
 function plotScore(state,id,player){return neighbors(id).reduce((n,k)=>n+(state.lots[k].owner===player?3:state.lots[k].owner===null?1:0),0);}
 function botDraft(state,player,count,rng){const offered=shuffle(state.lots.filter(l=>l.owner===null&&!state.pending.includes(l.id)).map(l=>l.id),rng).slice(0,count+2);for(let i=0;i<count&&offered.length;i++){offered.sort((a,b)=>plotScore(state,b,player)-plotScore(state,a,player));state.lots[offered.shift()].owner=player;}}

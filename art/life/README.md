@@ -1,6 +1,6 @@
-# Vietnamtown street life
+# Saigon Town street life
 
-Original pixel-coordinate drawings executed and exported using the installed Aseprite application and its native Lua image, layer, cel and frame APIs. All PNGs use transparent backgrounds and the existing warm Vietnamtown palette. No AI-generated image was used.
+Original pixel-coordinate drawings executed and exported using the installed Aseprite application and its native Lua image, layer, cel and frame APIs. All PNGs use transparent backgrounds and the existing warm Saigon Town palette. No AI-generated image was used.
 
 | Export | Native size | Notes |
 | --- | --- | --- |
