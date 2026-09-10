@@ -6,7 +6,7 @@ export const SHOPS=[
 {id:'tailor',name:'Tiệm may',english:'Tailor',code:'MA',size:5,color:'#587c9a'},
 {id:'grocery',name:'Tạp hóa',english:'Corner grocer',code:'TH',size:6,color:'#648454'}];
 export const DISTRICTS=['Tân Định','Bến Thành','Thảo Điền','Chợ Lớn','Bình Thạnh','Phú Nhuận'];
-export const COLORS=['#326c5e','#d4a543','#628da5','#bc7776'];
+export const COLORS=['#39a883','#eec353','#dc6f57','#7fb5cf'];
 export const KEEP=[5,4,3,2,2,2];
 export const COMPLETE=[0,0,0,50,80,110,140];
 export const INCOMPLETE=[0,10,20,40,60,80];
@@ -26,7 +26,7 @@ export function beginBuild(state){if(state.phase!=='trade')throw Error('Finish c
 export function canPlace(state,player,id,shop){if(!Number.isInteger(id)||!state.lots[id]||!Number.isInteger(shop)||!SHOPS[shop])return false;const lot=state.lots[id];if(lot.owner!==player||lot.shop!==null||state.players[player].tiles[shop]<1)return false;return true;}
 export function placeShop(state,id,shop,player=0){if(state.phase!=='build')throw Error('Shops open during the Build phase.');if(!canPlace(state,player,id,shop))throw Error('Choose your own empty plot and a tile you have in hand.');state.lots[id].shop=shop;state.players[player].tiles[shop]--;log(state,`${state.players[player].name} opened ${SHOPS[shop].name} on plot ${id+1}.`);return {id,shop};}
 export function botBuild(state,player){let guard=0;while(guard++<30){let best=null;for(const l of holdings(state,player).filter(l=>l.shop===null)){for(let s=0;s<SHOPS.length;s++){if(!canPlace(state,player,l.id,s))continue;const adjacent=neighbors(l.id).filter(n=>state.lots[n].owner===player&&state.lots[n].shop===s).length;const possible=neighbors(l.id).filter(n=>state.lots[n].owner===player&&state.lots[n].shop===null).length;const before=income(state,player);l.shop=s;const delta=income(state,player)-before;l.shop=null;const score=delta*2+adjacent*8+possible*2+state.players[player].tiles[s]-SHOPS[s].size;if(!best||score>best.score)best={id:l.id,shop:s,score};}}if(!best)break;placeShop(state,best.id,best.shop,player);}}
-export function finishYear(state){if(state.phase!=='build')throw Error('Finish trading before collecting income.');for(let p=1;p<4;p++)botBuild(state,p);state.lastIncome=state.players.map(p=>income(state,p.id));for(let p=0;p<4;p++)state.players[p].cash+=state.lastIncome[p];log(state,`Year ${state.year} closed. You earned ${state.lastIncome[0]} million ₫.`);state.phase=state.year===6?'ended':'income';return state.lastIncome;}
+export function finishYear(state){if(state.phase!=='build')throw Error('Finish trading before collecting income.');for(let p=1;p<4;p++)botBuild(state,p);state.lastIncome=state.players.map(p=>income(state,p.id));for(let p=0;p<4;p++)state.players[p].cash+=state.lastIncome[p];log(state,`Year ${state.year} closed. You earned ${state.lastIncome[0]} đ.`);state.phase=state.year===6?'ended':'income';return state.lastIncome;}
 export function nextYear(state,rng=Math.random){if(state.phase!=='income')throw Error('Collect this year’s income first.');state.year++;startYear(state,rng);}
 export function log(state,message){state.logs.unshift(message);if(state.logs.length>100)state.logs.length=100;}
 const sideValue=(state,side,recipient)=>side.cash+side.tiles.reduce((v,count,i)=>v+count*(10+state.players[recipient].tiles[i]*1.5+groups(state,recipient).filter(g=>g.shop===i&&g.size<SHOPS[i].size).length*6),0)+side.lots.reduce((v,id)=>{const l=state.lots[id];const adjacency=neighbors(id).filter(n=>state.lots[n].owner===recipient).length;return v+18+adjacency*14+(l.shop===null?0:15+10*(7-state.year));},0);
