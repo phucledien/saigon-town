@@ -1,4 +1,4 @@
-import {plotNeighbors,BOARD_REVISION} from './board-layout.mjs?v=7';
+import {plotNeighbors,BOARD_REVISION} from './board-layout.mjs?v=8';
 export const SHOPS=[
 {id:'coffee',name:'Cà phê',english:'Coffee house',code:'CF',size:3,color:'#825d43'},
 {id:'banhmi',name:'Bánh mì',english:'Sandwich shop',code:'BM',size:3,color:'#b7782c'},

@@ -32,9 +32,10 @@ test('plot taps, shop builds and phase changes never replace the running street 
     return result;
   }
   nodes.set('#app',node('#app'));
+  nodes.set('#start-screen',node('#start-screen'));
   const state=engine.newGame(()=>.31),frames=[];
   const ctx=vm.createContext({...engine,BLOCK_LAYOUTS,PLOT_LAYOUT,cameraFor,dragCamera,
-    $:selector=>nodes.get(selector)||null,state,language:'vi',view:'play',selectedShop:null,selectedLot:null,chosen:[],freshLots:[],rackOpen:false,
+    $:selector=>nodes.get(selector)||null,state,language:'vi',view:'play',menuOpen:false,selectedShop:null,selectedLot:null,chosen:[],freshLots:[],rackOpen:false,
     cameraCenter:{x:550,y:365},camera:null,cameraInitialized:false,cameraScale:null,
     hudResizeObserver:null,renderedYear:1,observedPhase:'',phaseDelay:null,
     SPRITES:['coffee','banhmi','pho','flowers','tailor','grocery'],

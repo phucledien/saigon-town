@@ -6,7 +6,7 @@ body>.game-top{display:none}
 #app{width:100%;max-width:none;height:100dvh;margin:0;padding:0;min-height:0}
 .game-shell{position:relative;isolation:isolate;height:100%;display:grid;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden;background:#203f34;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
 .game-hud-top{z-index:12;display:grid;grid-template-columns:154px minmax(0,1fr) 52px;gap:14px;align-items:center;padding:8px 16px;background:linear-gradient(#253d30f5,#142d25f5);border-bottom:3px solid #a17b45;box-shadow:0 4px 16px #08191088}
-.game-brand{color:#f1d191;font-family:Georgia,serif;font-weight:900;font-size:24px;line-height:.96;letter-spacing:1px;text-shadow:0 3px #091c15}
+.game-brand{color:#f1d191;font-family:'Lora',Georgia,serif;font-weight:900;font-size:24px;line-height:.96;letter-spacing:1px;text-shadow:0 3px #091c15}
 .game-brand span{display:block;font-size:13px;letter-spacing:6px;margin:7px 0 0}
 .hud-menu,.belt-button{min-width:48px;min-height:48px;padding:7px;color:#ffe2a0;background:linear-gradient(#4d6342,#263c2d);border:2px solid #af8c52;border-radius:8px;box-shadow:0 3px #0b1d15;line-height:1.15;cursor:pointer}
 .hud-menu{font-size:23px}.hud-menu small,.belt-button small{display:block;font-size:12px;margin-top:3px}

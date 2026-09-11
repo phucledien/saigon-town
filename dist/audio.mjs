@@ -12,11 +12,13 @@ const safeRead = (key,fallback=false) => { try { const value=globalThis.localSto
 const safeWrite = (key, value) => { try { globalThis.localStorage?.setItem(key, value ? 'on' : 'off'); } catch {} };
 
 export function createGameAudio({ onChange } = {}) {
-  let sfx = safeRead('vietnamtown-sound'), music = safeRead('vietnamtown-music',true);
+  let sfx = safeRead('vietnamtown-sound',true), music = safeRead('vietnamtown-music',true);
   let ctx, master, musicBus, effectsBus, noiseBuffer, timer = null;
   let phase = 'receive', trading = false, unlocked = false, destroyed = false;
   let step = 0, nextBeat = 0, previousTap = -1, transportGeneration = 0;
   const voices = new Set();
+  let resumePromise=null;
+  const pendingCues=[];
   const doc = globalThis.document;
   const visible = () => !doc?.hidden;
   const enabled = () => sfx || music;
@@ -36,7 +38,7 @@ export function createGameAudio({ onChange } = {}) {
       for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
       ctx.onstatechange = () => {
         if (ctx?.state !== 'running') stopTransport();
-        else if (music && visible() && !destroyed) startTransport();
+        else {if(!unlocked||!visible()||!enabled()){void sync();return;}if (music && !destroyed) startTransport();flushCues();}
       };
       return true;
     } catch { ctx = null; return false; }
@@ -114,22 +116,50 @@ export function createGameAudio({ onChange } = {}) {
     stopTransport(); stopMusicVoices(); step = 0;
     startTransport();
   }
+  function queueCue(type,args){
+    if(!sfx||!unlocked||!visible()||destroyed||!ctx)return;
+    if(type==='speak'||args[0]==='tap'){
+      const previous=pendingCues.findIndex(cue=>cue.type===type&&(type==='speak'||cue.args[0]==='tap'));
+      if(previous>=0)pendingCues.splice(previous,1);
+    }
+    pendingCues.push({type,args,expires:Date.now()+700});
+    if(pendingCues.length>8)pendingCues.shift();
+  }
+  function flushCues(){
+    if(ctx?.state!=='running')return;
+    const cues=pendingCues.splice(0);
+    if(!sfx||!visible()||destroyed)return;
+    for(const cue of cues)if(cue.expires>=Date.now()){
+      if(cue.type==='speak')speak(...cue.args);else play(...cue.args);
+    }
+  }
+  function resumeContext(){
+    // Called synchronously from trusted activation; later actions share this
+    // promise instead of racing multiple resumes on mobile Safari.
+    if(!resumePromise){
+      try{resumePromise=Promise.resolve(ctx.resume()).catch(()=>{}).finally(()=>resumePromise=null);}catch{return Promise.resolve();}
+    }
+    return resumePromise;
+  }
   async function sync() {
     const generation = ++transportGeneration;
     if (destroyed) return;
     if (!unlocked || !visible() || !enabled()) {
+      pendingCues.length=0;
       stopTransport();
       for (const item of voices) fadeVoice(item);
       if (ctx?.state === 'running') { try { await ctx.suspend(); } catch {} }
       return;
     }
     if (!ctx) return;
-    try { if (ctx.state === 'suspended' || ctx.state === 'interrupted') await ctx.resume(); } catch {}
+    if (ctx.state === 'suspended' || ctx.state === 'interrupted') await resumeContext();
     if (destroyed || generation !== transportGeneration || !visible()) return;
     if (music) startTransport(); else { stopTransport(); stopMusicVoices(); }
+    flushCues();
   }
   function play(kind = 'tap') {
-    if (!sfx || !unlocked || !visible() || destroyed || !ctx || ctx.state !== 'running') return;
+    if (!sfx || !unlocked || !visible() || destroyed || !ctx) return;
+    if(ctx.state!=='running'){queueCue('play',[kind]);return;}
     const now = ctx.currentTime;
     if (kind === 'tap' && now - previousTap < .045) return;
     if (kind === 'tap') previousTap = now;
@@ -198,7 +228,8 @@ export function createGameAudio({ onChange } = {}) {
     source.start(at); source.stop(at + duration + .02);
   }
   function speak(mood = 'positive', person = 1) {
-    if (!sfx || !unlocked || !visible() || destroyed || !ctx || ctx.state !== 'running') return;
+    if (!sfx || !unlocked || !visible() || destroyed || !ctx) return;
+    if(ctx.state!=='running'){queueCue('speak',[mood,person]);return;}
     stopSpeech();
     const phrase = SPEECH[mood] || SPEECH.thinking;
     // Linh is brighter, Minh lower, An softer. Stable voices support recognition.
@@ -215,14 +246,14 @@ export function createGameAudio({ onChange } = {}) {
   doc?.addEventListener('visibilitychange', visibilityChange);
   return {
     async unlock() { if (destroyed) return false; unlocked = true; ensureContext(); await sync(); return ctx?.state === 'running'; },
-    setSfx(value) { sfx = Boolean(value); safeWrite('vietnamtown-sound', sfx); if (!sfx) for (const item of voices) if (!item.music) fadeVoice(item); notify(); void sync(); },
+    setSfx(value) { sfx = Boolean(value); safeWrite('vietnamtown-sound', sfx); if (!sfx){pendingCues.length=0;for (const item of voices) if (!item.music) fadeVoice(item);} notify(); void sync(); },
     setMusic(value) { music = Boolean(value); safeWrite('vietnamtown-music', music); notify(); void sync(); },
     setPhase(value) { if (PHASES[value] && value !== 'bargain' && phase !== value) { phase = value; if (!trading) restartScore(); } },
     setTrading(value) { value = Boolean(value); if (trading !== value) { trading = value; restartScore(); } },
     play, speak, getSettings: settings,
     destroy() {
       if (destroyed) return;
-      destroyed = true; transportGeneration++; stopTransport();
+      destroyed = true; transportGeneration++; pendingCues.length=0;stopTransport();
       doc?.removeEventListener('visibilitychange', visibilityChange);
       for (const item of voices) { try { item.source.stop(); } catch {} release(item); }
       if (ctx) { ctx.onstatechange = null; void ctx.close().catch(() => {}); }
