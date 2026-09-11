@@ -8,11 +8,11 @@ const PHASES = {
   bargain: { beat: .27, chords: [[57,60,64,67],[57,60,64,71],[53,57,60,64],[52,56,59,62]], lead: [2,1,3,0], tone: 'triangle', cutoff: 1750 }
 };
 const HZ = midi => 440 * 2 ** ((midi - 69) / 12);
-const safeRead = key => { try { return globalThis.localStorage?.getItem(key) === 'on'; } catch { return false; } };
+const safeRead = (key,fallback=false) => { try { const value=globalThis.localStorage?.getItem(key);return value==null?fallback:value==='on'; } catch { return fallback; } };
 const safeWrite = (key, value) => { try { globalThis.localStorage?.setItem(key, value ? 'on' : 'off'); } catch {} };
 
 export function createGameAudio({ onChange } = {}) {
-  let sfx = safeRead('vietnamtown-sound'), music = safeRead('vietnamtown-music');
+  let sfx = safeRead('vietnamtown-sound'), music = safeRead('vietnamtown-music',true);
   let ctx, master, musicBus, effectsBus, noiseBuffer, timer = null;
   let phase = 'receive', trading = false, unlocked = false, destroyed = false;
   let step = 0, nextBeat = 0, previousTap = -1, transportGeneration = 0;
