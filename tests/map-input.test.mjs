@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {cameraFor,pinchCamera,scaleLimits} from '../dist/camera.mjs';
+import {cameraFor,pinchCamera,scaleLimits,wheelCamera} from '../dist/camera.mjs';
 import {MapInput} from '../dist/map-input.mjs';
 
 test('pinch keeps the world point under a moving finger midpoint',()=>{
@@ -46,4 +46,29 @@ test('ignored fingers remain blocked after the pinch fingers lift, including can
   g.down(4,{x:100,y:200},c,390,500);g.down(5,{x:200,y:200},c,390,500);
   g.clear(true);assert.equal(g.blocksClick,true);g.up(4,c);g.up(5,c);assert.equal(g.blocksClick,false);
   g.down(6,{x:100,y:200},c,390,500);assert.equal(g.up(6,c),false);
+});
+test('wheel zoom anchors to the pointer, normalizes delta units, and respects both bounds',()=>{
+  const w=1200,h=700,start=cameraFor(w,h,{x:550,y:365},1.8,'contain'),point={x:570,y:330};
+  const world={x:(point.x-start.left)/start.scale,y:(point.y-start.top)/start.scale};
+  const into=wheelCamera(w,h,start,point,-80),out=wheelCamera(w,h,start,point,80);
+  assert.ok(into.scale>start.scale);assert.ok(out.scale<start.scale);
+  assert.ok(Math.abs(into.left+world.x*into.scale-point.x)<.001);
+  assert.ok(Math.abs(out.top+world.y*out.scale-point.y)<.001);
+  assert.deepEqual(wheelCamera(w,h,start,point,1,1),wheelCamera(w,h,start,point,16,0));
+  assert.deepEqual(wheelCamera(w,h,start,point,.1,2),wheelCamera(w,h,start,point,70,0));
+  let min=start,max=start;for(let i=0;i<30;i++){min=wheelCamera(w,h,min,point,10000);max=wheelCamera(w,h,max,point,-10000);}
+  assert.equal(min.scale,scaleLimits(w,h,'contain').min);assert.equal(max.scale,scaleLimits(w,h,'contain').max);
+});
+test('desktop overview survives dragging and touch pinch without jumping to mobile zoom',()=>{
+  const w=1440,h=650,g=new MapInput(),overview=cameraFor(w,h,undefined,null,'contain');
+  g.down(1,{x:500,y:300},overview,w,h);
+  const moved=g.move(1,{x:550,y:340});g.up(1,moved);
+  assert.equal(moved.scale,overview.scale);assert.equal(moved.fit,'contain');
+  const zoomed=wheelCamera(w,h,moved,{x:720,y:325},-240);
+  g.down(2,{x:500,y:300},zoomed,w,h);
+  const pan=g.move(2,{x:530,y:300});g.up(2,pan);
+  assert.equal(pan.scale,zoomed.scale);assert.equal(pan.fit,'contain');
+  g.down(3,{x:500,y:300},pan,w,h);g.down(4,{x:900,y:300},pan,w,h);
+  const back=g.move(4,{x:501,y:300});
+  assert.equal(back.scale,overview.scale);assert.equal(back.fit,'contain');
 });

@@ -6,4 +6,4 @@ Original pixel artwork drawn and exported in native Aseprite with `draw-saigon-v
 - `mini-vacant-plot.aseprite`: 64×64 transparent plot with pavement, curb, and road edge. Number geometry is in `geometry.json`; exported as `plot-mini-v9.png`.
 - `tear-off-calendar.aseprite`: 96×128 red binding, brass rings, and cream paper; live year text is placed by the game. Exported as `calendar-paper-v9.png`.
 
-The folded calendar is a compact CSS paper tab; the expanded calendar uses the Aseprite backing. Player stools stay on a separate layer over the draft plots.
+The always-open calendar uses the Aseprite backing. Player stools stay on a separate layer over the draft plots.

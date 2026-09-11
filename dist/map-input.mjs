@@ -1,4 +1,4 @@
-import {cameraFor,dragCamera,pinchCamera} from './camera.mjs?v=9';
+import {cameraFor,dragCamera,pinchCamera} from './camera.mjs?v=10';
 const midpoint=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
 const distance=(a,b)=>Math.max(1,Math.hypot(a.x-b.x,a.y-b.y));
 
@@ -20,7 +20,7 @@ export class MapInput {
     const dx=point.x-this.pan.point.x,dy=point.y-this.pan.point.y;
     if(!this.active&&Math.hypot(dx,dy)<6)return null;
     this.active=true;
-    return cameraFor(this.width,this.height,dragCamera(this.pan.camera,dx,dy),this.pan.camera.scale);
+    return cameraFor(this.width,this.height,dragCamera(this.pan.camera,dx,dy),this.pan.camera.scale,this.pan.camera.fit);
   }
   up(id,camera){
     if(this.ignored.delete(id))return true;

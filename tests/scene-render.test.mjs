@@ -5,6 +5,7 @@ import vm from 'node:vm';
 import * as engine from '../dist/engine.mjs';
 import {BLOCK_LAYOUTS,PLOT_LAYOUT} from '../dist/board-layout.mjs';
 import {cameraFor,dragCamera} from '../dist/camera.mjs';
+import {zodiacImages} from '../dist/zodiac.mjs';
 
 test('plot taps, shop builds and phase changes never replace the running street scene',()=>{
   // A DOM-write boundary test, not a CSS timing simulation. Forbid mutations to
@@ -37,10 +38,10 @@ test('plot taps, shop builds and phase changes never replace the running street 
   const ctx=vm.createContext({...engine,BLOCK_LAYOUTS,PLOT_LAYOUT,cameraFor,dragCamera,
     $:selector=>nodes.get(selector)||null,state,language:'vi',view:'play',menuOpen:false,selectedShop:null,selectedLot:null,chosen:[],freshLots:[],rackOpen:false,
     cameraCenter:{x:550,y:365},camera:null,cameraInitialized:false,cameraScale:null,
-    hudResizeObserver:null,calendarExpanded:false,renderedYear:1,observedPhase:'',phaseDelay:null,
+    hudResizeObserver:null,renderedYear:1,observedPhase:'',phaseDelay:null,zodiacImages,
     SPRITES:['coffee','banhmi','pho','flowers','tailor','grocery'],
     LANDMARKS:['tan-dinh','ben-thanh','thao-dien','cho-lon','binh-thanh','phu-nhuan'],
-    ZODIAC:[['Tỵ'],['Ngọ'],['Mùi'],['Thân'],['Dậu'],['Tuất']],TOKEN_COLORS:['green','gold','red','blue'],
+    ZODIAC:[['Tỵ','Snake','snake'],['Ngọ','Horse','horse'],['Mùi','Goat','goat'],['Thân','Monkey','monkey'],['Dậu','Rooster','rooster'],['Tuất','Dog','dog']],TOKEN_COLORS:['green','gold','red','blue'],
     money:n=>`${n} đ`,tr:(en,vi)=>vi,escape:s=>s,
     document:{documentElement:{},body:{dataset:{},classList:{toggle(){}}}},
     gameAudio:{setPhase(){}},cancelMapGesture(){},dismissPhase(){},updateGuides(){},animateWallets(){},animateYear(){},updateSoundButton(){},

@@ -43,3 +43,15 @@ test('opening the shop tray retains the focused neighborhood',()=>{
   const after=cameraFor(390,350,before);
   assert.equal(after.x,before.x);assert.equal(after.y,before.y);
 });
+test('desktop overview contains the complete board at default and minimum zoom',()=>{
+  for(const [width,height] of [[1920,900],[1440,730],[1280,580]]){
+    for(const scale of [null,.01]){
+      const c=cameraFor(width,height,{x:250,y:220},scale,'contain');
+      assert.ok(c.left>=-.001&&c.top>=-.001);
+      assert.ok(c.left+WORLD.width*c.scale<=width+.001);
+      assert.ok(c.top+WORLD.height*c.scale<=height+.001);
+      assert.equal(c.x,550);assert.equal(c.y,365);
+      assert.ok(c.scale<scaleLimits(width,height).min,'desktop can go below the mobile cover limit');
+    }
+  }
+});

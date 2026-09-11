@@ -25,9 +25,8 @@
 .game-shell .wallet strong{min-width:0}
 .game-shell .pocket-token b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hand-total{display:none}
-/* The folded tab stays at the map edge; the full leaf opens on request. */
-.game-shell .calendar.paper-calendar{right:0;top:0;width:48px;height:80px;padding:0;margin:0;filter:drop-shadow(-2px 3px 2px #17362955)}
-.game-shell .paper-calendar.expanded{width:104px;height:139px}
+/* The full paper leaf remains visible at the map edge. */
+.game-shell .calendar.paper-calendar{right:0;top:0;width:104px;height:139px;padding:0;margin:0;filter:drop-shadow(-2px 3px 2px #17362955)}
 .calendar-sheet{position:relative;width:100%;height:100%;transform-origin:top center;background:url('/assets/ui/calendar-paper-v9.png') center/100% 100% no-repeat;image-rendering:pixelated}
 .calendar-date{position:absolute;inset:0;display:block;width:100%;height:100%;border:0;padding:0;background:none;box-shadow:none;color:#953c2d;text-shadow:none;border-radius:0}
 .calendar-heading{position:absolute;top:21%;left:15%;right:13%;font:700 10px var(--font-ui);letter-spacing:1px;color:#fff0bb}
@@ -36,15 +35,8 @@
 .calendar-animal{position:absolute;top:63%;left:20%;right:16%;display:flex;justify-content:center;align-items:center;gap:3px;font:700 11px/16px var(--font-book);color:#544c30}
 .calendar-animal img{width:16px;height:16px;object-fit:contain}
 .calendar-footnote{position:absolute;top:75%;left:17%;right:15%;font:700 7px/9px var(--font-ui);color:#756245}
-.calendar-fold{position:absolute;right:0;top:0;width:44px;height:44px;padding:0 1px 0 23px;border:0;border-radius:0;background:none;box-shadow:none;color:#fff0bc;font:24px var(--font-ui)}
-.calendar-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:17px 1px 4px 6px;border:1px solid #bd9457;border-right:0;border-radius:2px 0 0 2px;background:linear-gradient(#aa4937 0 15px,#f3e5b7 15px 94%,#d8c798 94%);box-shadow:inset 3px 0 #fff1c9,inset -2px 0 #e2cd9a;color:#973e2d;text-shadow:none}
-.calendar-tab:before,.calendar-tab:after{content:'';position:absolute;top:0;width:3px;height:9px;border:1px solid #715526;background:#ceb56d;border-radius:2px}
-.calendar-tab:before{left:11px}.calendar-tab:after{right:10px}
-.calendar-tab small{font:700 8px var(--font-ui);letter-spacing:1px;color:#725638}
-.calendar-tab strong{font:700 28px/1 var(--font-book)}
-.calendar-tab>span{font:700 11px/1.2 var(--font-book);color:#5a5134}
-.calendar-tab>b{position:absolute;left:2px;top:41px;font-size:15px;color:#a88952}
-.calendar-date:focus-visible,.calendar-tab:focus-visible,.calendar-fold:focus-visible{outline:2px solid #ffe498;outline-offset:-2px}
+.calendar-date:focus-visible{outline:2px solid #ffe498;outline-offset:-2px}
+@media(hover:hover) and (pointer:fine){.game-shell .map-viewport{background:#203f34}}
 /* These sprites face right; their crossing routes travel toward the left. */
 .crossing-one span,.crossing-two span,.crossing-three span{transform:scale(-.75,.75);transform-origin:center bottom}
 /* Phones and short landscape windows use two small rails, not desktop panels. */
