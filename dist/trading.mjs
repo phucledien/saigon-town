@@ -1,4 +1,4 @@
-import {SHOPS,holdings,emptyOffer,trade} from './engine.mjs?v=4';
+import {SHOPS,holdings,emptyOffer,trade} from './engine.mjs?v=5';
 
 export function makeDraft(state, partner, prefillLot=null, prefillShop=null) {
   if (![1,2,3].includes(partner)) throw Error('Choose a neighbor.');

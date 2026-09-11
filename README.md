@@ -14,7 +14,9 @@ Keep 5/4/3/2/2/2 addresses in years 1–6. Receive five shop pieces initially, t
 
 ## Interface and art
 
-- A zoomable Aseprite city board, irregular plot foundations, grouped high-contrast district signs, six original shop and landmark sets, and physical ownership counters.
+- One full-viewport game screen with a fixed player HUD, zodiac wheel, bottom action belt, and a collapsible shop rack. No page scrolling is needed to reach controls and there are no zoom controls.
+- An Aseprite city board with automatic camera sizing, swipe-to-pan movement and six neighborhood shortcuts. Plots remain at least 45 screen pixels wide; keyboard focus brings offscreen plots into view. Irregular plot foundations, high-contrast signs, original shops and landmarks, and physical ownership counters remain intact.
+- Touch gestures are separated: the map pans, the rack scrolls horizontally, and dialogs scroll their contents. Touch building uses tap-piece then tap-plot; mouse drag-and-drop remains available. Dialog positioning follows the phone keyboard viewport.
 - Ninja Lead scooter riders, a bus with passengers, walking pedestrians and fictional lotus banknotes. Street animation persists across state renders.
 - Dismissible phase guides, address-reveal reels, target highlights, quick building, zodiac turns, flying banknotes and wallet count-up.
 - A visual two-sided bargaining table with inventory limits, plot/piece shortcuts, counteroffers, and scripted Vietnamese/English reactions.
@@ -37,7 +39,7 @@ Retained: six rounds, package negotiation, permanent shops, shared-edge business
 
 Static ES modules in `dist`; no build step. Serve that directory over HTTP. Run `node --test tests/*.test.mjs`.
 
-Fourteen engine/trading tests pass, including 100 complete simulated games, resource conservation, permanent placement, mixed trades, exact counteroffers, geometry bridges, overflow income, one-time payday, and saved-state migration preservation. Audio mocks cover formant creation, positive/negative cadences, overlap cancellation, phase transitions, independent muting, visibility and cleanup.
+Eighteen camera/engine/trading tests pass, including reachability of all 72 plots at phone and landscape dimensions, camera bounds and tray resizing, 100 complete simulated games, resource conservation, permanent placement, mixed trades, exact counteroffers, geometry bridges, overflow income, one-time payday, and saved-state migration preservation. Audio mocks cover formant creation, positive/negative cadences, overlap cancellation, phase transitions, independent muting, visibility and cleanup.
 
 Feature-detected WebMCP exposes game state, address claims, build, placement, quote/propose trade, payday and year advancement. Contract checks use an isolated fresh game; existing player saves must not be mutated for testing. Broad browser visual testing was not requested.
 
