@@ -1,64 +1,95 @@
 # Saigon Town
 
-A complete local six-year negotiation board game inspired by Chinatown, hosted on Sites. One person plays against Linh, Minh and An, three scripted computer neighbors. The primary game interface and bargaining dialogue support Vietnamese and English. Game progress stays in the current browser.
+[![Saigon Town: Vietnamese storefronts, colorful stools, and a neighborhood ready for business](dist/assets/saigon-town-og-v8.png)](https://vietnamtown.phucledien.chatgpt.site/)
 
-## Playing
+**Pull up a stool. There’s a deal to make.**
 
-Choose offered addresses, negotiate any package of cash, shop pieces and owned plots, permanently build shops, and collect annual income. Same-owner shops of the same type connect only across shared edges within a neighborhood. The richest player after the sixth payday wins; placed shop pieces break ties.
+[**Play Saigon Town →**](https://vietnamtown.phucledien.chatgpt.site/) · [Run locally](#run-locally) · [Explore the art](art/)
 
-The 72 plots form six different irregular shapes, with stepped rows and cut-out corners. Courtyards, rooftops, roads and diagonal corners never create connections. `dist/board-layout.mjs` is the shared geometry used by rendering, income, computer moves and trade valuations.
+**1 player · 3 neighbors · 6 years · 72 addresses**
 
-Shop targets: Cà phê 3, Bánh mì 3, Phở 4, Tiệm hoa 4, Tiệm may 5, Tạp hóa 6. Incomplete groups of 1/2/3/4/5 pieces earn 10/20/40/60/80 đ annually. Complete targets of 3/4/5/6 earn 50/80/110/140 đ. Larger groups pay complete target-sized sets plus an incomplete remainder. The rack explicitly shows stock, connected-piece targets and annual payouts.
+A browser board game about opening shops, bargaining with neighbors, and finding the right corner of a fictional Sài Gòn. Inspired by [Chinatown](https://boardgamegeek.com/boardgame/47/chinatown), built with original Aseprite artwork, and playable in Vietnamese or English.
 
-Keep 5/4/3/2/2/2 addresses in years 1–6. Receive five shop pieces initially, then four per year from a 120-piece bag. Cash starts at 50 đ. These are fictional game values.
+*Chốt một kèo. Mở một tiệm. Gầy dựng góc phố Sài Gòn.*
 
-## Interface and art
+<p align="center">
+  <img src="dist/assets/shops/coffee.png" width="96" height="96" alt="Cà phê shop">
+  <img src="dist/assets/shops/banhmi.png" width="96" height="96" alt="Bánh mì shop">
+  <img src="dist/assets/shops/pho.png" width="96" height="96" alt="Phở shop">
+  <img src="dist/assets/shops/flowers.png" width="96" height="96" alt="Tiệm hoa florist">
+  <img src="dist/assets/shops/tailor.png" width="96" height="96" alt="Tiệm may tailor">
+  <img src="dist/assets/shops/grocery.png" width="96" height="96" alt="Tạp hóa grocer">
+</p>
 
-- A full-screen start/pause menu offers Start or Continue, a confirmed New Game, Settings, How to Play, the journal and Aseprite artbook. Opening it preserves the current game. Play waits for decoded game artwork, with progress and a retry for failed loads.
-- Four original Aseprite plastic stools replace ownership discs throughout the board, HUD and bargaining screen. They preserve the green, gold, red and blue player colors.
-- One full-viewport game screen with a fixed player HUD, always-open Vietnamese tear-off calendar, woven-mat action belt, and a collapsible shop rack. No page scrolling is needed to reach controls. There is no district shortcut bar or zoom-button toolbar; two-finger pinching controls map scale.
-- An Aseprite city board with automatic camera sizing, swipe-to-pan movement, and pinch zoom anchored between the fingers. On touch screens, default camera sizing keeps plots at least 45 screen pixels wide and minimum pinch scale fills the playfield. Desktop starts with the whole town in view, supports mouse-wheel/trackpad-scroll zoom around the pointer, and preserves zoom through dragging. With the map focused, +/− zoom and 0 restores the overview. Keyboard focus brings offscreen plots into view. High-contrast signs use six original, transparent monochrome Aseprite icons. The faint map title has been removed.
-- Touch gestures are separated: the map pans, the rack scrolls horizontally, and dialogs scroll their contents. Phones and short landscape screens use a 44px player row and 52px action row. Names, cash, and total shop stock have explicit positions; detailed inventories open when a player is tapped. The compact shop drawer closes after touch selection. Touch building uses tap-piece then tap-plot; mouse drag-and-drop remains available. Dialog positioning follows the phone keyboard viewport.
-- Ninja Lead scooter riders, a bus with passengers, walking pedestrians and fictional lotus banknotes. Nine corrected zebra crossings follow the roads, clear the center markings and have paired curbside traffic lights. Pedestrian foot-contact paths align with the corrected crossings, and the inner walking sprite faces the direction of travel. The map, terrain and traffic stay mounted while plots and HUD regions update, so taps and phase changes do not restart street animations.
-- Dismissible phase guides, address-reveal reels, target highlights, quick building, calendar page flips, flying banknotes and wallet count-up.
-- A visual two-sided bargaining table with inventory limits, plot/piece shortcuts, counteroffers, and scripted Vietnamese/English reactions.
-- Original synthesized lo-fi music and action sounds default on when there is no saved preference, starting after the first user gesture. Explicit mute remains respected. A separate music-and-sound settings panel controls music and tap effects independently. Bot reactions use moving vowel formants: happy ascending babble, skeptical descending babble, and thinking murmurs. No recorded voices or external audio services. All speech follows the sound-effects switch; music has its own switch. Capture-phase activation wakes audio before action handlers. A bounded 700ms cue queue preserves first-action sounds across delayed Safari resume, and clears on mute or backgrounding. Late resumes reconcile mute and visibility. Gesture unlock, visibility pause, overlap cancellation and cleanup are enforced.
-- The action belt uses an original Aseprite chiếu weave with red/green dyed threads. Miniature pavement plots carry address numbers and selected ownership stools. The full 104×139px red-bound calendar stays visible against the right map edge; tapping opens six-year details. Artwork loads before Start.
-- An old bound shop ledger with ruled pages, completion stamps, per-business earnings, expansion notes, totals, and page navigation.
+## Six years to make your corner count
 
-Fonts are bundled locally: Be Vietnam Pro for controls, Lora for the board and ledger, and Bungee for the title. SIL Open Font License files ship beside them. OG/X sharing metadata uses original 1200×630 Aseprite artwork. The web app manifest and 180/192/512px icons support home-screen pinning; there is no offline service worker.
+You play against Linh, Minh, and An across 72 addresses in six irregular neighborhood blocks. Each year has four steps:
 
-All raster artwork was drawn and exported through native Aseprite, with editable layered sources and reproducible Lua scripts under `art/`. The in-game artbook offers source and PNG archives. No AI panorama remains in the active board.
+1. **Receive.** Choose your offered plots and collect shop pieces. Your colored stools mark your addresses.
+2. **Trade.** Offer cash, plots, and shop pieces. A neighbor’s spare piece might complete your business; your empty corner might be exactly what they want.
+3. **Build.** Place shops on your empty plots. Matching shops of your color connect along shared edges within a block. Complete the target printed on each piece to earn more.
+4. **Collect.** Every business pays its owner, including unfinished groups. Keep unused pieces for next year.
 
-## Saved games
+The most cash after the sixth payday wins. Placed shop pieces break ties. Building is permanent, and roads and diagonal corners do not connect shops. Amounts shown in **đ** are fictional game values.
 
-The existing storage key `vietnamtown-save-v1` is intentionally preserved after the rename. The irregular-map revision retains plot IDs, owners, placed shops, cash, hands, bag, current phase/year and previous payouts. It changes visible adjacency, so future income and trade values follow the new geometry. The first load records this transition once in the journal and shows a brief notice. New games start directly on this board revision.
+## A little street life
 
-## Research and adaptation
+- Six distinct storefronts: cà phê, bánh mì, phở, flowers, tailoring, and groceries.
+- Ninja Lead riders, buses, walking pedestrians, and shop-opening animations.
+- A woven chiếu action belt, plastic ownership stools, a tear-off calendar, and a handwritten-style business ledger.
+- Visual bargaining, counteroffers, and Vietnamese or English reactions from your neighbors.
+- Phase guides, flying banknotes, animated earnings, and locally synthesized lo-fi music and sound effects.
 
-[Chinatown on BoardGameGeek](https://boardgamegeek.com/boardgame/47/chinatown) · [2014 Z-Man Games rulebook, mirrored](https://cdn.1j1ju.com/medias/46/fa/78-chinatown-rulebook.pdf).
+All raster artwork has editable native Aseprite sources under [art/](art/), with Lua drawing and export scripts. Start with the [shop notes](art/shops/README.md), [street-life notes](art/life/README.md), or [tabletop artwork](art/tabletop-v9/README.md).
 
-Retained: six rounds, package negotiation, permanent shops, shared-edge businesses, repeat income, overflow scoring and cash victory. Adapted: 72 plots rather than 85, six business types, a larger tile supply, visible cash, sequential address choices and scripted opponents. The fictional city layout and artwork are original. The research notebook links cultural storefront and landmark references. Its prose and historical game-log entries remain English.
+## Controls
 
-## Development and validation
+| Action | Desktop | Phone or tablet |
+| --- | --- | --- |
+| Move around town | Drag the map | Swipe the map |
+| Zoom | Mouse wheel or trackpad scroll over the map | Pinch with two fingers |
+| Build a shop | Select a piece and click your plot, or drag it onto the plot | Select a piece, then tap your plot |
+| Start a trade | Click a neighbor or their plot during Trade | Tap a neighbor or their plot during Trade |
+| Inspect | Click a player, plot, or the calendar | Tap a player, plot, or the calendar |
 
-Static ES modules in `dist`; no build step. Serve that directory over HTTP. Run `node --test tests/*.test.mjs`.
+With the map focused, **arrow keys** pan, **+ / −** zoom, and **0** resets the view. The shop rack scrolls sideways. Music starts after interaction; music and effects have separate switches in **Settings**.
 
-Thirty-nine tests (including seven audio lifecycle subtests) pass, including a DOM-write boundary regression check for uninterrupted scene ownership during plot selection, builds and phase changes; pinch anchoring, mobile fill limits, desktop overview bounds, normalized wheel units, pointer anchoring, and zoom preservation across drags; two-finger to one-finger transitions; cancellation and tap protection; default music versus saved mute; reachability of all 72 plots at phone and landscape dimensions; camera bounds and tray resizing; 100 complete simulated games; resource conservation; permanent placement; mixed trades; exact counteroffers; geometry bridges; overflow income; one-time payday; and saved-state migration preservation. Additional checks cover menu save preservation, image decode/retry, allowed scrolling inside the artbook/trade/guide panels, first-action audio, stale cue expiry, bounded queues and late resume after mute or hide. The scene check executes the actual renderer against guarded DOM write targets; it does not simulate browser animation timing. Audio mocks cover formant creation, positive/negative cadences, overlap cancellation, phase transitions, independent muting, visibility and cleanup.
+## Run locally
 
-Feature-detected WebMCP exposes game state, address claims, build, placement, quote/propose trade, payday and year advancement. Contract checks use an isolated fresh game; existing player saves must not be mutated for testing. Broad browser visual testing was not requested.
+No build step or package installation. Serve `dist/` over HTTP:
 
-The existing Sites link is retained under the new Saigon Town name. There is no backend, online multiplayer or remote game-state storage. Online rooms and wider economy playtesting remain future work.
+```sh
+git clone https://github.com/phucledien/saigon-town.git
+cd saigon-town
+python3 -m http.server 8000 --bind 127.0.0.1 --directory dist
+```
 
-## Mobile interaction references
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000). Python 3 is only the local file server; the game runs in your browser.
 
-The compact HUD uses contextual controls, direct object manipulation, reachable primary actions and fewer persistent overlays, informed by [Apple Game Controls](https://developer.apple.com/design/human-interface-guidelines/game-controls). The pointer state machine follows the interaction lifecycle described in [MDN Pinch Zoom Gestures](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events/Pinch_zoom_gestures), with world-anchor preservation and cancellation handling. Music starts on a user gesture in accordance with [browser autoplay policies](https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Autoplay). These informed implementation; physical-phone visual QA has not been performed.
+Run the tests with Node.js:
 
+```sh
+node --test tests/*.test.mjs
+```
 
-## Safari and loading references
+The suite covers the economy, trades, board geometry, saved games, camera and gesture behavior, menu and loading flows, audio lifecycle, and preservation of the animated street scene during rendering.
 
-Page scroll, pinch/double-tap zoom, selection and image callouts are suppressed on the game surface while the custom map pinch, scrollable trays/dialogs and editable cash inputs remain available. The camera retains its two-finger zoom. Safari may retain OS-level accessibility gestures. Actual iPhone hardware/audio testing has not been performed.
+## Around the repository
 
-- [MDN user activation](https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/User_activation) and [Web Audio best practices](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Best_practices) informed synchronous activation and short-lived cue handling. The sound is synthesized locally, so it has no audio files to download; its context and noise buffer are prepared on first activation.
-- [WebKit iOS interaction behavior](https://webkit.org/blog/7367/new-interaction-behaviors-in-ios-10/) and [MDN touch-action](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/touch-action) informed page gesture guards and per-region scrolling.
-- [Apple web app configuration](https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/ConfiguringWebApplications/ConfiguringWebApplications.html) informed home-screen metadata. [MDN image decode](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/decode) informed asset warming.
+| Path | What’s inside |
+| --- | --- |
+| [dist/](dist/) | The playable static site, styles, and exported assets |
+| [dist/engine.mjs](dist/engine.mjs) | Game rules, income, trading, and scripted opponents |
+| [dist/app.mjs](dist/app.mjs) | Game screen, menus, and interactions |
+| [dist/board-layout.mjs](dist/board-layout.mjs) | Shared plot geometry |
+| [art/](art/) | Layered Aseprite originals, scripts, and asset notes |
+| [tests/](tests/) | Tests using Node’s built-in test runner |
+| [docs/implementation-notes.md](docs/implementation-notes.md) | Economy tables, architecture, save migrations, and research references |
+
+## Current scope
+
+This is a **single-player local game with scripted bots**. There is no online multiplayer or backend. Progress is saved in the current browser; it does not sync between devices, and the local development URL has its own save. The app can be added to a home screen, but it does not provide offline caching.
+
+The main game interface and bargaining dialogue support Vietnamese and English. The research notebook and historical journal entries remain English. The in-game artbook contains design references and downloadable source artwork.
+
+Saigon Town is an independent adaptation with original artwork and a fictional map. Bundled fonts are Be Vietnam Pro, Lora, and Bungee; their license files are included in [dist/assets/fonts/](dist/assets/fonts/).
