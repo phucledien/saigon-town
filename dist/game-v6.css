@@ -1,4 +1,5 @@
 /* Keep the city dominant; reveal detail when a player asks for it. */
+.plot-layer,.calendar-layer,.inspector-layer{display:contents}
 .game-shell .district-navigation,.map-plaque{display:none}
 .district-identity{height:28px;top:-34px;gap:6px;padding-left:6px}
 .landmark-medallion{width:25px;height:25px;display:grid;place-items:center;background:none;border:0;border-radius:0;box-shadow:none;transform:none}

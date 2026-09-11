@@ -1,4 +1,4 @@
-import {cameraFor,dragCamera,pinchCamera} from './camera.mjs?v=6';
+import {cameraFor,dragCamera,pinchCamera} from './camera.mjs?v=7';
 const midpoint=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
 const distance=(a,b)=>Math.max(1,Math.hypot(a.x-b.x,a.y-b.y));
 
