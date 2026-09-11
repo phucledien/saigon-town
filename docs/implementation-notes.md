@@ -1,12 +1,12 @@
 # Implementation notes
 
-A complete local six-year negotiation board game inspired by Chinatown, hosted on Sites. One person plays against Linh, Minh and An, three scripted computer neighbors. The primary game interface and bargaining dialogue support Vietnamese and English. Game progress stays in the current browser.
+A complete local six-year negotiation board game inspired by Chinatown. The public game URL is [saigontown.phucld.com](https://saigontown.phucld.com/). One person plays against Linh, Minh and An, three scripted computer neighbors. The primary game interface and bargaining dialogue support Vietnamese and English. Game progress stays in the current browser.
 
 ## Playing
 
 Choose offered addresses, negotiate any package of cash, shop pieces and owned plots, permanently build shops, and collect annual income. Same-owner shops of the same type connect only across shared edges within a neighborhood. The richest player after the sixth payday wins; placed shop pieces break ties.
 
-The 72 plots form six different irregular shapes, with stepped rows and cut-out corners. Courtyards, rooftops, roads and diagonal corners never create connections. `dist/board-layout.mjs` is the shared geometry used by rendering, income, computer moves and trade valuations.
+The 72 plots form six different irregular shapes, with stepped rows and cut-out corners. Courtyards, rooftops, roads and diagonal corners never create connections. `src/board-layout.ts` is the shared geometry used by rendering, income, computer moves and trade valuations.
 
 Shop targets: Cà phê 3, Bánh mì 3, Phở 4, Tiệm hoa 4, Tiệm may 5, Tạp hóa 6. Incomplete groups of 1/2/3/4/5 pieces earn 10/20/40/60/80 đ annually. Complete targets of 3/4/5/6 earn 50/80/110/140 đ. Larger groups pay complete target-sized sets plus an incomplete remainder. The rack explicitly shows stock, connected-piece targets and annual payouts.
 
@@ -42,18 +42,59 @@ Retained: six rounds, package negotiation, permanent shops, shared-edge business
 
 ## Development and validation
 
-Static ES modules in `dist`; no build step. Serve that directory over HTTP. Run `node --test tests/*.test.mjs`.
+The maintained source is strict TypeScript in `src/`. The root `index.html` loads `src/main.ts` during development; that entry imports the game and `src/styles/index.css`. Vite bundles browser JavaScript and CSS into generated `dist/` files. `public/` is copied into the build root, so a source file such as `public/assets/shops/coffee.png` is served at `/assets/shops/coffee.png`.
 
-Thirty-nine tests (including seven audio lifecycle subtests) pass, including a DOM-write boundary regression check for uninterrupted scene ownership during plot selection, builds and phase changes; pinch anchoring, mobile fill limits, desktop overview bounds, normalized wheel units, pointer anchoring, and zoom preservation across drags; two-finger to one-finger transitions; cancellation and tap protection; default music versus saved mute; reachability of all 72 plots at phone and landscape dimensions; camera bounds and tray resizing; 100 complete simulated games; resource conservation; permanent placement; mixed trades; exact counteroffers; geometry bridges; overflow income; one-time payday; and saved-state migration preservation. Additional checks cover menu save preservation, image decode/retry, allowed scrolling inside the artbook/trade/guide panels, first-action audio, stale cue expiry, bounded queues and late resume after mute or hide. The scene check executes the actual renderer against guarded DOM write targets; it does not simulate browser animation timing. Audio mocks cover formant creation, positive/negative cadences, overlap cancellation, phase transitions, independent muting, visibility and cleanup.
+The main module boundaries are:
+
+| Source                                   | Responsibility                                                     |
+| ---------------------------------------- | ------------------------------------------------------------------ |
+| `src/types.ts`                           | Shared game-state, player, plot, shop, and offer contracts         |
+| `src/engine.ts`                          | Game transitions, business groups, income, trading, and bots       |
+| `src/board-layout.ts`                    | Authoritative irregular plot positions and adjacency               |
+| `src/app.ts` and `src/dom.ts`            | Game orchestration, DOM access, menus, and effects                 |
+| `src/trading.ts`                         | Visual bargaining flow and offer selection                         |
+| `src/camera.ts` and `src/map-input.ts`   | Camera geometry and pointer gesture state                          |
+| `src/mobile.ts` and `src/preload.ts`     | Page gesture guards and decoded artwork warming                    |
+| `src/audio.ts`                           | Synthesized music, effects, bot reactions, and audio lifecycle     |
+| `src/ui/research.ts` and `src/zodiac.ts` | Research/artbook presentation and zodiac artwork                   |
+| `src/styles/`                            | Split source stylesheets with the existing cascade order preserved |
+
+No application source is maintained in `dist/`; it is generated and ignored by Git. Editable raster sources remain under `art/`, and exported assets and font licenses live under `public/assets/`.
+
+Use Node 24 (`.nvmrc`) and the committed lockfile:
+
+```sh
+nvm use
+npm ci
+npm run dev
+```
+
+Validation and production preview:
+
+```sh
+npm run typecheck
+npm run test
+npm run build
+npm run preview
+```
+
+`npm run typecheck` uses the strict project TypeScript configuration. Tests remain Node test-runner files, importing the native TypeScript modules through tsx. `npm run build` performs the type check, runs Vite, and invokes `scripts/verify-build.mjs`. The verifier checks that generated HTML loads bundled JavaScript/CSS, that concrete local resource references resolve within `dist/`, that canonical and social-image metadata use the public domain, and that the manifest and home-screen icons exist. It reads local output only and does not verify a remote host.
+
+The regression suite covers resource conservation, permanent placement, mixed trades and exact counteroffers, geometry bridges, overflow income, one-time payday, saved-state migration preservation, and 100 complete simulated games. It also covers camera bounds, reachability of all 72 plots, pinch/wheel anchoring, desktop overview, zoom preservation, pointer transitions and cancellation, menu save preservation, image decode/retry, permitted drawer/dialog scrolling, and scene ownership during render updates. Audio tests cover saved mute, independent switches, first-action cues, bounded queues, stale-cue expiry, late resumes, formants, overlap cancellation, visibility, and cleanup. Scene tests use guarded DOM write targets; they do not simulate browser animation timing. Keep the current test output as the authority for test counts and results.
 
 Feature-detected WebMCP exposes game state, address claims, build, placement, quote/propose trade, payday and year advancement. Contract checks use an isolated fresh game; existing player saves must not be mutated for testing.
 
-The existing Sites link is retained under the new Saigon Town name. There is no backend, online multiplayer or remote game-state storage. Online rooms and wider economy playtesting remain future work.
+### Static deployment
+
+The host configuration for this source layout is Node 24, build command `npm ci && npm run build`, and publish directory `dist`. The repository contains source and public assets; the generated output is built by the host. `npm run preview` is only a local production preview.
+
+Canonical, Open Graph, and social-image URLs target `https://saigontown.phucld.com/`. Updating these files or passing local build verification does not configure a custom domain or establish that a remote deployment has changed. Those hosting settings and deployed behavior are checked separately when publishing.
+
+There is no backend, online multiplayer, or remote game-state storage. Online rooms and wider economy playtesting remain future work.
 
 ## Mobile interaction references
 
 The compact HUD uses contextual controls, direct object manipulation, reachable primary actions and fewer persistent overlays, informed by [Apple Game Controls](https://developer.apple.com/design/human-interface-guidelines/game-controls). The pointer state machine follows the interaction lifecycle described in [MDN Pinch Zoom Gestures](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events/Pinch_zoom_gestures), with world-anchor preservation and cancellation handling. Music starts on a user gesture in accordance with [browser autoplay policies](https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Autoplay). These informed implementation; physical-phone visual QA has not been performed.
-
 
 ## Safari and loading references
 

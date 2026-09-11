@@ -1,0 +1,26 @@
+{
+  "name": "saigon-town",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A Vietnamese trading board game with original Aseprite artwork.",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.mjs",
+    "build": "npm run typecheck && vite build && node --import tsx scripts/verify-build.mjs",
+    "preview": "vite preview --host 127.0.0.1",
+    "format": "prettier --write src tests scripts index.html vite.config.ts tsconfig.json package.json",
+    "format:check": "prettier --check src tests scripts index.html vite.config.ts tsconfig.json package.json"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.2",
+    "prettier": "^3.9.6",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.0"
+  }
+}

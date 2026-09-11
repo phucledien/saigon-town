@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#15382b" />
+    <meta
+      name="description"
+      content="Build your corner of Saigon. Trade plots, bargain with neighbors, and open Vietnamese shops in a colorful six-year board game."
+    />
+    <meta name="application-name" content="Saigon Town" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Saigon Town" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no" />
+    <title>Saigon Town · Buôn có bạn, bán có phường</title>
+    <link rel="canonical" href="https://saigontown.phucld.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Saigon Town" />
+    <meta property="og:title" content="Saigon Town · Pull up a stool" />
+    <meta
+      property="og:description"
+      content="Make a deal. Open a shop. Grow your corner of Saigon in a colorful Vietnamese trading game."
+    />
+    <meta property="og:url" content="https://saigontown.phucld.com/" />
+    <meta
+      property="og:image"
+      content="https://saigontown.phucld.com/assets/saigon-town-og-v8.png"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Saigon Town pixel art: a café, bánh mì and phở shops, and four colorful Vietnamese stools."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Saigon Town · Pull up a stool" />
+    <meta
+      name="twitter:description"
+      content="Build, bargain, and grow your corner of Saigon. A Vietnamese trading board game."
+    />
+    <meta
+      name="twitter:image"
+      content="https://saigontown.phucld.com/assets/saigon-town-og-v8.png"
+    />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/assets/icons/app-icon-192-v8.png" type="image/png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/assets/icons/app-icon-180-v8.png" sizes="180x180" />
+    <link
+      rel="preload"
+      href="/assets/city/saigon-city-board-v6.png"
+      as="image"
+      fetchpriority="high"
+    />
+    <link
+      rel="preload"
+      href="/assets/fonts/be-vietnam-regular.ttf"
+      as="font"
+      type="font/ttf"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/assets/fonts/be-vietnam-bold.ttf"
+      as="font"
+      type="font/ttf"
+      crossorigin
+    />
+    <link rel="preload" href="/assets/fonts/bungee.ttf" as="font" type="font/ttf" crossorigin />
+    <link rel="preload" href="/assets/fonts/lora.ttf" as="font" type="font/ttf" crossorigin />
+  </head>
+  <body>
+    <main id="app"></main>
+    <section id="start-screen" class="start-screen" aria-label="Saigon Town · Menu">
+      <div class="start-panel">
+        <h1 class="start-logo">SAIGON<span>TOWN</span></h1>
+        <p role="status">Đang mở phố…</p>
+        <noscript>Vui lòng bật JavaScript để chơi Saigon Town.</noscript>
+      </div>
+    </section>
+    <dialog id="modal"></dialog>
+    <div id="phase-cue" role="status" aria-live="polite"></div>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <div id="effects" aria-hidden="true"></div>
+    <div id="drag-piece" aria-hidden="true"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
