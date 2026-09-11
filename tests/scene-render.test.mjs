@@ -37,7 +37,7 @@ test('plot taps, shop builds and phase changes never replace the running street 
   const ctx=vm.createContext({...engine,BLOCK_LAYOUTS,PLOT_LAYOUT,cameraFor,dragCamera,
     $:selector=>nodes.get(selector)||null,state,language:'vi',view:'play',menuOpen:false,selectedShop:null,selectedLot:null,chosen:[],freshLots:[],rackOpen:false,
     cameraCenter:{x:550,y:365},camera:null,cameraInitialized:false,cameraScale:null,
-    hudResizeObserver:null,renderedYear:1,observedPhase:'',phaseDelay:null,
+    hudResizeObserver:null,calendarExpanded:false,renderedYear:1,observedPhase:'',phaseDelay:null,
     SPRITES:['coffee','banhmi','pho','flowers','tailor','grocery'],
     LANDMARKS:['tan-dinh','ben-thanh','thao-dien','cho-lon','binh-thanh','phu-nhuan'],
     ZODIAC:[['Tỵ'],['Ngọ'],['Mùi'],['Thân'],['Dậu'],['Tuất']],TOKEN_COLORS:['green','gold','red','blue'],

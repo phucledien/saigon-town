@@ -5,7 +5,8 @@ export const GAME_IMAGES=[
   ...shops.map(name=>`/assets/shops/${name}.png`),
   ...[0,1,2,3].map(id=>`/assets/materials/stool-${id}-v8.png`),
   ...districts.map(name=>`/assets/signs/${name}-v6.png`),
-  ...['plot-ground','calendar-wheel'].map(name=>`/assets/materials/${name}.png`),
+  '/assets/materials/plot-ground.png',
+  ...['chieu-mat-v9','plot-mini-v9','calendar-paper-v9'].map(name=>`/assets/ui/${name}.png`),
   ...['ninja-lead','city-bus','pedestrian-walk','game-banknote'].map(name=>`/assets/life/${name}.png`)
 ];
 const decoded=new Map();

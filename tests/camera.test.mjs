@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {cameraFor,dragCamera,WORLD} from '../dist/camera.mjs';
+import {cameraFor,dragCamera,WORLD,scaleLimits} from '../dist/camera.mjs';
 import {PLOT_LAYOUT,CELL_SIZE} from '../dist/board-layout.mjs';
 
 test('every address can be brought fully into a phone or landscape playfield',()=>{
@@ -14,12 +14,17 @@ test('every address can be brought fully into a phone or landscape playfield',()
     }
   }
 });
-test('a roomy playfield shows the entire town without user zoom',()=>{
-  const c=cameraFor(1440,1000,{x:200,y:200});
-  assert.ok(c.left>=0&&c.top>=0);
-  assert.ok(c.left+WORLD.width*c.scale<=1440);
-  assert.ok(c.top+WORLD.height*c.scale<=1000);
-  assert.equal(c.x,550);assert.equal(c.y,365);
+test('default and minimum zoom fill portrait, landscape and desktop without blank bands',()=>{
+  for(const [width,height] of [[390,720],[430,850],[844,180],[1440,1000]]){
+    for(const scale of [null,scaleLimits(width,height).min]){
+      for(const center of [{x:0,y:0},{x:550,y:365},{x:1100,y:730}]){
+        const c=cameraFor(width,height,center,scale);
+        assert.ok(c.left<=.001&&c.top<=.001);
+        assert.ok(c.left+WORLD.width*c.scale>=width-.001);
+        assert.ok(c.top+WORLD.height*c.scale>=height-.001);
+      }
+    }
+  }
 });
 test('drag distance is in screen pixels and repeated drags stay within town edges',()=>{
   const start=cameraFor(390,450,{x:500,y:350});

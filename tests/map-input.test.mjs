@@ -9,11 +9,12 @@ test('pinch keeps the world point under a moving finger midpoint',()=>{
   assert.equal(next.scale,2);assert.equal(next.x,490);assert.equal(next.y,330);
   assert.equal(next.left+450*next.scale,120);assert.equal(next.top+315*next.scale,220);
 });
-test('pinch bounds permit an overview and cap enlargement without leaving the town',()=>{
+test('pinch bounds fill the playfield and cap enlargement without leaving the town',()=>{
   const start=cameraFor(390,510);
   const out=pinchCamera(390,510,start,{x:195,y:255},{x:195,y:255},.001);
   assert.equal(out.scale,scaleLimits(390,510).min);
-  assert.ok(out.left>=-1e-8);assert.ok(out.left+1100*out.scale<=390+1e-8);
+  assert.ok(out.left<=1e-8);assert.ok(out.left+1100*out.scale>=390-1e-8);
+  assert.ok(out.top<=1e-8);assert.ok(out.top+730*out.scale>=510-1e-8);
   const into=pinchCamera(390,510,start,{x:195,y:255},{x:10000,y:10000},100);
   assert.equal(into.scale,2.8);assert.ok(into.left<=0&&into.top<=0);
 });
